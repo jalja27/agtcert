@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Demo</title>
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <link rel="stylesheet" href="http://g.alicdn.com/msui/sm/0.6.2/css/sm.min.css">
+  <link rel="stylesheet" href="http://g.alicdn.com/msui/sm/0.6.2/css/sm-extend.min.css">
+
+</head>
+<body id = "container">
+
+
+
+
+<script type='text/javascript' src='http://g.alicdn.com/sj/lib/zepto/zepto.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='http://g.alicdn.com/msui/sm/0.6.2/js/sm.min.js' charset='utf-8'></script>
+<script type='text/javascript' src='http://g.alicdn.com/msui/sm/0.6.2/js/sm-extend.min.js' charset='utf-8'></script>
+<script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+<script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+<script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+
+
+<script type='text/babel'>
+
+
+        var Header = React.createClass({
+            render: function() {
+                return (
+                <header className="bar bar-nav">
+                    <h1 className='title'>资格证查询demo</h1>
+                </header>
+                );
+            }
+        });
+
+
+        var CertDemoBody = React.createClass({
+            getInitialState:function(){
+              return{
+                queryCertNo:'',
+                btnSearchClass:'button button-fill',
+                disabled:'false',
+                btnSearchText:'查询',
+                name:'',
+                gender:'',
+                certType:'',
+                dtlType:'',
+                certNo:'',
+                certStatus:''
+              }
+            },
+
+            handleClick:function(event){
+
+
+                var queryCertNo = this.refs.searchParam.value;
+
+                 this.setState({
+                              btnSearchClass:'button disabled',
+                              disabled:'true',
+                              btnSearchText:'查询中...'
+                 });
+
+                var req = new Request('http://192.3.108.109:8080/certno/vertify/'+queryCertNo,
+                  {method:'GET',cache:'reload'});
+
+                fetch(req).then((res)=>{
+                    if(res.ok){
+                        res.text().then((data)=>{
+                            var json =  JSON.parse(data);
+                            console.log(json);
+                            if(json.resCode!='00'){
+                              alert(json.resMsg);
+                            }
+
+
+                            this.setState({
+                              name:json.name,
+                              gender:json.gender,
+                              certType:json.certType,
+                              dtlType:json.dtlType,
+                              certNo:json.certNo,
+                              certStatus:json.certStatus,
+                              btnSearchClass:'button button-fill',
+                              disabled:'false',
+                              btnSearchText:'查询'
+                              });
+
+
+
+                        })
+                    }
+                }).catch((res)=>{
+                    console.log(res.status);
+                });
+            },
+
+            render: function() {
+                return (
+                <div class="page-group" id = "container">
+                    <Header/>
+                    <div className="content">
+                        <div className="list-block">
+                            <ul>
+                            <li>
+                                <div className="item-content">
+                                <div className="item-inner">
+                                    <div className="item-title label">资格证号</div>
+                                    <div className="item-input">
+                                      <input type="text" placeholder="请输入资格证号" ref="searchParam" />
+                                    </div>
+                                </div>
+                                </div>
+                            </li>
+                            </ul>
+                        </div>
+
+                        <div className="content-block">
+                            <p><a href="#" disabled={this.state.disabled} className={this.state.btnSearchClass} onClick={this.handleClick} id = 'btnSearch'>{this.state.btnSearchText}</a></p>
+                        </div>
+                        <div className="content-block-title">查询结果</div>
+                        <div className="list-block" >
+                          <ul>
+                    <li className="item-content">
+                        <div className="item-media"><i className="icon icon-f7"></i></div>
+                        <div className="item-inner">
+                        <div className="item-title">姓名</div>
+                        <div className="item-after">{this.state.name}</div>
+                        </div>
+                    </li>
+                    <li className="item-content">
+                        <div className="item-media"><i className="icon icon-f7"></i></div>
+                        <div className="item-inner">
+                        <div className="item-title">性别</div>
+                        <div className="item-after">{this.state.gender}</div>
+                        </div>
+                    </li>
+                    <li className="item-content">
+                            <div className="item-media"><i className="icon icon-f7"></i></div>
+                            <div className="item-inner">
+                                <div className="item-title">资格证书类别</div>
+                                <div className="item-after">{this.state.certType}</div>
+                            </div>
+                            </li>
+                            <li className="item-content">
+                            <div className="item-media"><i className="icon icon-f7"></i></div>
+                            <div className="item-inner">
+                                <div className="item-title">资格证书小类</div>
+                                <div className="item-after">{this.state.dtlType}</div>
+                            </div>
+                    </li>
+                    <li className="item-content">
+                            <div className="item-media"><i className="icon icon-f7"></i></div>
+                            <div className="item-inner">
+                                <div className="item-title">资格证书号码</div>
+                                <div className="item-after">{this.state.certNo}</div>
+                            </div>
+                            </li>
+                            <li className="item-content">
+                            <div className="item-media"><i className="icon icon-f7"></i></div>
+                            <div className="item-inner">
+                                <div className="item-title">有效期</div>
+                                <div className="item-after">{this.state.certStatus}</div>
+                            </div>
+                    </li>
+                    </ul>
+                        </div>
+
+                </div>
+               </div>
+                );
+            }
+        });
+
+        ReactDOM.render(
+            <CertDemoBody></CertDemoBody>,
+            document.getElementById('container')
+        )
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>
